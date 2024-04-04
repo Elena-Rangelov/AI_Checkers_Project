@@ -29,12 +29,55 @@ class State():
         for i in range(self.BOARD_COLS):
             for j in range(self.BOARD_ROWS):
                 if p.first:
-                    self.board[i][j] == 1:
+                    if self.board[i][j]%2 == 1:
+
+                        if self.board[i-1][j-1] == 0:
+                            positions[(i, j)] += [(i-1, j-1)]
+                        elif self.board[i-1][j-1] != 0 and self.board[i-1][j-1]%2 == 0 and self.board[i-2][j-2]:
+                            positions[(i, j)] += [(i-2, j-2)]
+
+                        if self.board[i+1][j-1] == 0:
+                            positions[(i, j)] += [(i+1, j-1)]
+                        elif self.board[i+1][j-1] != 0 and self.board[i+1][j-1]%2 == 0 and self.board[i+2][j-2]:
+                            positions[(i, j)] += [(i+2, j-2)]
+
+                        if self.board[i][j] == 3:
+
+                            if self.board[i+1][j+1] == 0:
+                                positions[(i, j)] += [(i+1, j+1)]
+                            elif self.board[i+1][j+1] != 0 and self.board[i+1][j+1]%2 == 0 and self.board[i+2][j+2]:
+                                positions[(i, j)] += [(i+2, j+2)]
+
+                            if self.board[i-1][j+1] == 0:
+                                positions[(i, j)] += [(i-1, j+1)]
+                            elif self.board[i-1][j+1] != 0 and self.board[i-1][j+1]%2 == 0 and self.board[i-2][j+2]:
+                                positions[(i, j)] += [(i-2, j+2)]
+                        
+                else:
+                    if self.board[i][j]%2 == 0 and self.board[i][j] != 0:
+
                         if self.board[i+1][j+1] == 0:
-                            positions[(i, j)] += 1
-                    elif self.board[i][j] == 3:
-                # finish
-                # el
+                            positions[(i, j)] += [(i+1, j+1)]
+                        elif self.board[i+1][j+1]%2 == 1 and self.board[i+2][j+2]:
+                            positions[(i, j)] += [(i+2, j+2)]
+
+                        if self.board[i-1][j+1] == 0:
+                            positions[(i, j)] += [(i-1, j+1)]
+                        elif self.board[i-1][j+1] != 0 and self.board[i-1][j+1]%2 == 0 and self.board[i-2][j+2]:
+                            positions[(i, j)] += [(i-2, j+2)]
+
+                        if self.board[i][j] == 3:
+
+                            if self.board[i-1][j-1] == 0:
+                                positions[(i, j)] += [(i-1, j-1)]
+                            elif self.board[i-1][j-1] != 0 and self.board[i-1][j-1]%2 == 0 and self.board[i-2][j-2]:
+                                positions[(i, j)] += [(i-2, j-2)]
+
+                            if self.board[i+1][j-1] == 0:
+                                positions[(i, j)] += [(i+1, j-1)]
+                            elif self.board[i+1][j-1] != 0 and self.board[i+1][j-1]%2 == 0 and self.board[i+2][j-2]:
+                                positions[(i, j)] += [(i+2, j-2)]
+                        
 
     def winner(self):
         # checking end state
