@@ -4,18 +4,20 @@ BOARD_COLS = 8
 BOARD_ROWS = 8
 
 class State():
-    def __init__(self, p1, p2):
-        self.board = [[0, 1, 0, 1, 0, 1, 0, 1],
+    def __init__(self, p1, p2, gamma):
+        self.board = np.array([[0, 1, 0, 1, 0, 1, 0, 1],
                     [1, 0, 1, 0, 1, 0, 1, 0],
                     [0, 1, 0, 1, 0, 1, 0, 1],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0, 0],
                     [2, 0, 2, 0, 2, 0, 2, 0],
                     [0, 2, 0, 2, 0, 2, 0, 2],
-                    [2, 0, 2, 0, 2, 0, 2, 0]]
+                    [2, 0, 2, 0, 2, 0, 2, 0]])
 
         self.p1 = p1
         self.p2 = p2
+
+        self.gamma = gamma
 
         self.isEnd = False
         self.boardHash = None
@@ -83,17 +85,71 @@ class State():
         # checking end state
         # christina
 
-    def updateState(self, pos):
-        # kaan
-        # update the board
+    def updateState(self, action):
+        # assuming action is ((x, y), (x_delta, y_delta), double: bool)
+        (x, y), (x_d, y_d), double = action
+
+        player = self.board[x, y]
+        pieces_taken = 0
+        in_danger = 0
+
+        if double:
+            self.board[x + x_d, y + y_d] = 0
+            new_pos = (x + 2 * x_d, y + 2 * y_d)
+            self.board[new_pos] = player
+            pieces_taken += 2
+        else:
+            new_pos = (x + x_d, y + y_d)
+            old_val = self.board[new_pos]
+            if  old_val not in [0, player]:
+                pieces_taken += 1
+            self.board[new_pos] = player
+
+        #TODO: turn pieces to queen
+
+        # checking danger after move
+        dx = 1 if player == 1 else -1
+
+        #TODO: check index out of bounds
+        x_p, y_p = new_pos
+        if self.board[x_p + dx, y_p - 1] not in [0, player] \
+            or self.board[x_p + dx, y_p + 1] not in [0, player]:
+            in_danger += 1
+
+        # return resulting "events" to be passed to reward function
+        return (self.p1 if player == 1 else self.p2,
+                pieces_taken, in_danger)
 
     def reset(self):
-        # kaan
-        # reset board
+        self.board = np.array([[0, 1, 0, 1, 0, 1, 0, 1], [1, 0, 1, 0, 1, 0, 1, 0],
+                               [0, 1, 0, 1, 0, 1, 0, 1], [0, 0, 0, 0, 0, 0, 0, 0],
+                               [0, 0, 0, 0, 0, 0, 0, 0], [2, 0, 2, 0, 2, 0, 2, 0],
+                               [0, 2, 0, 2, 0, 2, 0, 2], [2, 0, 2, 0, 2, 0, 2, 0]])
+        self.boardHash = None
+        self.isEnd = False
 
-    def giveReward(self):
-        # kaan
-        # assign rewards
+    def giveReward(self, turn, events):
+        # assumes winner() returns 0 for none, 1 for p1, 2 for p2
+
+        gamma = lambda val: val * (self.gamma ** turn)
+
+        win = self.winner()
+        if win == 1:
+            self.p1.feedReward(1)
+            self.p2.feedReward(-1)
+        elif win == 2:
+            self.p1.feedReward(-1)
+            self.p2.feedReward(1)
+        else:
+            # idk
+            self.p1.feedReward(gamma(0.01))
+            self.p2.feedReward(gamma(0.01))
+
+            # feeds player whos turn it was 0.5 * number of pieces they took
+            events[0].feedReward(gamma(events[1] * 0.5))
+            # in danger
+            events[0].feedReward(gamma(events[2] * -0.5))
+
 
     ############################# FOR LATER
     def playHuman(self):
