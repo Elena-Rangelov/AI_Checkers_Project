@@ -80,10 +80,47 @@ class State():
                             elif self.board[i+1][j-1] != 0 and self.board[i+1][j-1]%2 == 0 and self.board[i+2][j-2]:
                                 positions[(i, j)] += [(i+2, j-2)]
                         
-
     def winner(self):
-        # checking end state
-        # christina
+         
+        # first check if Player 1 won
+        if self.didPlayer1Win() == 1:
+            return 1
+       
+        # if Player 1 didn't win then check if Player 2 won
+        if self.didPlayer2Win() == 2:
+            return 2
+       
+        # if Player 2 also didn't win then we aren't in goal state yet
+        return -1
+   
+    # check if in goal state where Player 1 won
+    def didPlayer1Win(self):
+       
+        for i in range(self.BOARD_COLS):
+            for j in range(self.BOARD_ROWS):
+
+
+                # Player 1 won if they got rid of all of Player 2's pieces
+                if self.board[i][j] == 2 or self.board[i][j] == 4:
+                    self.isEnd = False
+                    return -1
+               
+        self.isEnd = True
+        return 1
+   
+    # check if in goal state where Player 2 won
+    def didPlayer2Win(self):
+        for i in range(self.BOARD_COLS):
+            for j in range(self.BOARD_ROWS):
+
+
+                # Player 2 won if they got rid of all of Player 1's pieces
+                if self.board[i][j] == 1 or self.board[i][j] == 3:
+                    self.isEnd = False
+                    return -1
+       
+        self.isEnd = True
+        return 2
 
     def updateState(self, action):
         # assuming action is ((x, y), (x_delta, y_delta), double: bool)

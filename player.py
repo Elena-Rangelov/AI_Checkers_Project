@@ -3,13 +3,31 @@ import numpy as np
 import random
 import pickle
 
+from state import State
+
 BOARD_COLS = 8
 BOARD_ROWS = 8
 
 class BotPlayer():
+    
     def __init__(self):
-        # christina
-        # initiate function
+
+        # records all positions taken for training purposes
+        self.states = []
+
+        # how much Q-vals are updated towards newly calc Q-vals
+        self.learning_rate = 0.2
+
+        # we will be doing e-greedy
+        # where 70% of the time, exploit: agent will take the greedy action (curr estimation of state-vals)
+        # and the other 30%, explore: agent will take a random action
+        self.exp_rate = 0.3
+
+        # discount factor ( to do living reward)
+        self.decay_gamma = 0.9
+
+        # dict to update the corresponding state -> val
+        self.states_value = {}
     
     def getHash(self, board):
         return str(board.reshape(BOARD_COLS * BOARD_ROWS))
@@ -49,9 +67,48 @@ class BotPlayer():
             # Updates reward for next iteration
             reward = self.states_value[curr]
 
+    # two AI bots play against each other for trainig purposes
     def play(self, rounds=100):
-        # christina
-        # play
+       
+        # number of episodes to train on
+        num_eps = 100
+
+        player_1 = self
+        player_2 = BotPlayer()
+
+        for _ in range(num_eps):
+
+            # create a new game for each round
+            # this reps the board
+            state = State(player_1, player_2)
+
+            # player_1 starts
+            curr_player = player_1
+
+            # run the game
+            while not state.isEnd:
+
+                # first look at all valid moves you can make
+                positions = curr_player.availablePositions()
+
+                # then choose an action based on our Q-learning alg
+                action = curr_player.chooseAction(positions, state)
+
+                # then update state based on the chosen action
+                state.updateState(action)
+
+                # then add state to curr_player's states
+                curr_player.addState(curr_player.getHash())
+
+                # swap turns
+                curr_player = player_1 if curr_player == player_2 else player_2
+           
+            # assign rewards based on the game outcome
+            reward = state.getReward()
+            curr_player.feedReward(reward)
+
+            player_1.reset()
+            player_2.reset()
 
     def reset(self):
         self.states = []
