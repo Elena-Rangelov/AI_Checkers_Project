@@ -40,7 +40,7 @@ class BotPlayer():
 
         else:
             value_max = -999
-            for p in pos:
+            for p in pos: # nested loop
                 next = board.copy()
                 next.updateState(p)
                 next_hash = self.getHash(next)

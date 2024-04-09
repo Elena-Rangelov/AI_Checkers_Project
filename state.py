@@ -30,13 +30,21 @@ class State():
         positions = {}
         for i in range(self.BOARD_COLS):
             for j in range(self.BOARD_ROWS):
+                
                 if p.first:
+                    
                     if self.board[i][j]%2 == 1:
 
                         if self.board[i-1][j-1] == 0:
                             positions[(i, j)] += [(i-1, j-1)]
                         elif self.board[i-1][j-1] != 0 and self.board[i-1][j-1]%2 == 0 and self.board[i-2][j-2]:
                             positions[(i, j)] += [(i-2, j-2)]
+                            # b = True
+                            # while b:
+                            #     if self.board[i-1][j-1] != 0 and self.board[i-1][j-1]%2 == 0 and self.board[i-2][j-2]:
+                            #     positions[(i, j)] += [(i-2, j-2)]
+                            #     if 
+
 
                         if self.board[i+1][j-1] == 0:
                             positions[(i, j)] += [(i+1, j-1)]
@@ -91,7 +99,7 @@ class State():
             return 2
        
         # if Player 2 also didn't win then we aren't in goal state yet
-        return -1
+        return 0
    
     # check if in goal state where Player 1 won
     def didPlayer1Win(self):
@@ -103,7 +111,7 @@ class State():
                 # Player 1 won if they got rid of all of Player 2's pieces
                 if self.board[i][j] == 2 or self.board[i][j] == 4:
                     self.isEnd = False
-                    return -1
+                    return 0
                
         self.isEnd = True
         return 1
@@ -117,30 +125,31 @@ class State():
                 # Player 2 won if they got rid of all of Player 1's pieces
                 if self.board[i][j] == 1 or self.board[i][j] == 3:
                     self.isEnd = False
-                    return -1
+                    return 0
        
         self.isEnd = True
         return 2
 
     def updateState(self, action):
-        # assuming action is ((x, y), (x_delta, y_delta), double: bool)
-        (x, y), (x_d, y_d), double = action
+        # assuming action is ((x, y), (x_delta, y_delta))
+        (x, y), (x_d, y_d) = action
+        # , double = action
 
         player = self.board[x, y]
         pieces_taken = 0
         in_danger = 0
 
-        if double:
-            self.board[x + x_d, y + y_d] = 0
-            new_pos = (x + 2 * x_d, y + 2 * y_d)
-            self.board[new_pos] = player
-            pieces_taken += 2
-        else:
-            new_pos = (x + x_d, y + y_d)
-            old_val = self.board[new_pos]
-            if  old_val not in [0, player]:
-                pieces_taken += 1
-            self.board[new_pos] = player
+        # if double:
+        #     self.board[x + x_d, y + y_d] = 0
+        #     new_pos = (x + 2 * x_d, y + 2 * y_d)
+        #     self.board[new_pos] = player
+        #     pieces_taken += 2
+        # else:
+        new_pos = (x + x_d, y + y_d)
+        old_val = self.board[new_pos]
+        if  old_val not in [0, player]:
+            pieces_taken += 1
+        self.board[new_pos] = player
 
         #TODO: turn pieces to queen
 
@@ -172,11 +181,11 @@ class State():
 
         win = self.winner()
         if win == 1:
-            self.p1.feedReward(1)
-            self.p2.feedReward(-1)
+            self.p1.feedReward(10)
+            self.p2.feedReward(-10)
         elif win == 2:
-            self.p1.feedReward(-1)
-            self.p2.feedReward(1)
+            self.p1.feedReward(-10)
+            self.p2.feedReward(10)
         else:
             # idk
             self.p1.feedReward(gamma(0.01))
