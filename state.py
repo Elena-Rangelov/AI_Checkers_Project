@@ -99,7 +99,6 @@ class State():
         for i in range(self.BOARD_COLS):
             for j in range(self.BOARD_ROWS):
 
-
                 # Player 1 won if they got rid of all of Player 2's pieces
                 if self.board[i][j] == 2 or self.board[i][j] == 4:
                     self.isEnd = False
@@ -112,7 +111,6 @@ class State():
     def didPlayer2Win(self):
         for i in range(self.BOARD_COLS):
             for j in range(self.BOARD_ROWS):
-
 
                 # Player 2 won if they got rid of all of Player 1's pieces
                 if self.board[i][j] == 1 or self.board[i][j] == 3:

@@ -88,8 +88,11 @@ class BotPlayer():
             # run the game
             while not state.isEnd:
 
-                # first look at all valid moves you can make
-                positions = curr_player.availablePositions()
+                # first look at all valid moves the curr player can make
+                # note: getAvailablePositions() will return a dict where 
+                # each key is curr_player's pieces (rep as a tup)
+                # and each of those keys map to a list of tups that piece can move to
+                positions = state.getAvailablePositions(curr_player)
 
                 # then choose an action based on our Q-learning alg
                 action = curr_player.chooseAction(positions, state)
@@ -97,18 +100,23 @@ class BotPlayer():
                 # then update state based on the chosen action
                 state.updateState(action)
 
+                # assign rewards
+                # this is called after every update state
+                # note: giveReward() calls feedReward()
+                state.giveReward()
+
                 # then add state to curr_player's states
-                curr_player.addState(curr_player.getHash())
+                curr_player.addStates(curr_player.getHash())
 
                 # swap turns
                 curr_player = player_1 if curr_player == player_2 else player_2
-           
-            # assign rewards based on the game outcome
-            reward = state.getReward()
-            curr_player.feedReward(reward)
 
+            # reset game and run another episode
             player_1.reset()
             player_2.reset()
+
+        # at very end of training we save policy
+        self.savePolicy()
 
     def reset(self):
         self.states = []
