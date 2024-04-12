@@ -27,17 +27,24 @@ class State():
         return self.boardHash
 
     def getAvailablePositions(self, p):
-
         positions = {}
         for i in range(self.BOARD_COLS):
             for j in range(self.BOARD_ROWS):
+
                 if p.first:
+
                     if self.board[i][j]%2 == 1:
 
                         if self.board[i-1][j-1] == 0:
                             positions[(i, j)] += [(i-1, j-1)]
                         elif self.board[i-1][j-1] != 0 and self.board[i-1][j-1]%2 == 0 and self.board[i-2][j-2]:
                             positions[(i, j)] += [(i-2, j-2)]
+                            # b = True
+                            # while b:
+                            #     if self.board[i-1][j-1] != 0 and self.board[i-1][j-1]%2 == 0 and self.board[i-2][j-2]:
+                            #     positions[(i, j)] += [(i-2, j-2)]
+                            #     if
+
 
                         if self.board[i+1][j-1] == 0:
                             positions[(i, j)] += [(i+1, j-1)]
@@ -82,17 +89,17 @@ class State():
                                 positions[(i, j)] += [(i+2, j-2)]
                         
     def winner(self):
-            return 1
-
+         
         # first check if Player 1 won
         if self.didPlayer1Win() == 1:
+            return 1
        
         # if Player 1 didn't win then check if Player 2 won
         if self.didPlayer2Win() == 2:
             return 2
        
         # if Player 2 also didn't win then we aren't in goal state yet
-        return -1
+        return 0
    
     # check if in goal state where Player 1 won
     def didPlayer1Win(self):
@@ -100,11 +107,10 @@ class State():
         for i in range(self.BOARD_COLS):
             for j in range(self.BOARD_ROWS):
 
-
                 # Player 1 won if they got rid of all of Player 2's pieces
                 if self.board[i][j] == 2 or self.board[i][j] == 4:
                     self.isEnd = False
-                    return -1
+                    return 0
                
         self.isEnd = True
         return 1
@@ -114,11 +120,10 @@ class State():
         for i in range(self.BOARD_COLS):
             for j in range(self.BOARD_ROWS):
 
-
                 # Player 2 won if they got rid of all of Player 1's pieces
                 if self.board[i][j] == 1 or self.board[i][j] == 3:
                     self.isEnd = False
-                    return -1
+                    return 0
        
         self.isEnd = True
         return 2
@@ -177,11 +182,11 @@ class State():
 
         win = self.winner()
         if win == 1:
-            self.p1.feedReward(1)
-            self.p2.feedReward(-1)
+            self.p1.feedReward(10)
+            self.p2.feedReward(-10)
         elif win == 2:
-            self.p1.feedReward(-1)
-            self.p2.feedReward(1)
+            self.p1.feedReward(-10)
+            self.p2.feedReward(10)
         else:
             # idk
             self.p1.feedReward(gamma(0.01))
