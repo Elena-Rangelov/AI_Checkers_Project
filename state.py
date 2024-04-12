@@ -27,6 +27,7 @@ class State():
         return self.boardHash
 
     def getAvailablePositions(self, p):
+
         positions = {}
         for i in range(self.BOARD_COLS):
             for j in range(self.BOARD_ROWS):
@@ -81,10 +82,10 @@ class State():
                                 positions[(i, j)] += [(i+2, j-2)]
                         
     def winner(self):
-         
+            return 1
+
         # first check if Player 1 won
         if self.didPlayer1Win() == 1:
-            return 1
        
         # if Player 1 didn't win then check if Player 2 won
         if self.didPlayer2Win() == 2:
@@ -123,35 +124,39 @@ class State():
         return 2
 
     def updateState(self, action):
-        # assuming action is ((x, y), (x_delta, y_delta), double: bool)
-        (x, y), (x_d, y_d), double = action
+        # action: [(x_i, y_i), (x_1, y_1) ... (x_f, y_f)]
 
-        player = self.board[x, y]
+        player = self.board[action[0]]
         pieces_taken = 0
         in_danger = 0
 
-        if double:
-            self.board[x + x_d, y + y_d] = 0
-            new_pos = (x + 2 * x_d, y + 2 * y_d)
-            self.board[new_pos] = player
-            pieces_taken += 2
-        else:
-            new_pos = (x + x_d, y + y_d)
-            old_val = self.board[new_pos]
-            if  old_val not in [0, player]:
+        for i in range(1, len(action)):
+            if self.board[action[i]] != 0:
                 pieces_taken += 1
-            self.board[new_pos] = player
+            self.board[action[i]] = 0
 
-        #TODO: turn pieces to queen
+        self.board[action[0]] = 0
+        new_pos = action[-1]
+
+        row_needed_queen = {2: 0, 1: BOARD_ROWS - 1}
+        # if now a queen
+        if row_needed_queen.get(player, -1) == new_pos[0]:
+            self.board[new_pos] = player * 2
+        else:
+            self.board[new_pos] = player
 
         # checking danger after move
         dx = 1 if player == 1 else -1
 
-        #TODO: check index out of bounds
+        #TODO: consider queens and maybe multiple hops
         x_p, y_p = new_pos
-        if self.board[x_p + dx, y_p - 1] not in [0, player] \
-            or self.board[x_p + dx, y_p + 1] not in [0, player]:
-            in_danger += 1
+        if 0 <= x_p + dx < self.board.shape[0]:
+            if 0 <= y_p - 1 < self.board.shape[1]:
+                if self.board[x_p + dx, y_p - 1] not in [0, player, player*2]:
+                    in_danger += 1
+            if 0 <= y_p + 1 < self.board.shape[1]:
+                if self.board[x_p + dx, y_p + 1] not in [0, player, player*2]:
+                    in_danger += 1
 
         # return resulting "events" to be passed to reward function
         return (self.p1 if player == 1 else self.p2,
