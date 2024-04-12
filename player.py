@@ -34,10 +34,14 @@ class BotPlayer():
 
     def chooseAction(self, pos, board):
 
+        # generate random number to determine if exploring or exploiting
         if random.random() <= self.explore:
+
+            #exploring - randomly choose an action from the list of actions
             p_id = random.choice(len(pos))
             action = pos[p_id]
 
+        # exploiting
         else:
             value_max = -999
             for p in pos: # nested loop
