@@ -8,9 +8,9 @@ from state import State
 BOARD_COLS = 8
 BOARD_ROWS = 8
 
-class BotPlayer():
+class Player():
     
-    def __init__(self):
+    def __init__(self, first):
 
         # records all positions taken for training purposes
         self.states = []
@@ -28,6 +28,8 @@ class BotPlayer():
 
         # dict to update the corresponding state -> val
         self.states_value = {}
+
+        self.first = first
     
     def getHash(self, board):
         return str(board.reshape(BOARD_COLS * BOARD_ROWS))
@@ -35,7 +37,7 @@ class BotPlayer():
     def chooseAction(self, actions, board):
 
         # generate random number to determine if exploring or exploiting
-        if random.random() <= self.explore:
+        if random.random() <= self.exp_rate:
 
             #exploring - randomly choose an action from the list of actions
             pos = random.choice(len(actions))
@@ -73,57 +75,6 @@ class BotPlayer():
             # Updates reward for next iteration
             reward = self.states_value[curr]
 
-    # two AI bots play against each other for trainig purposes
-    def play(self, rounds=100):
-       
-        # number of episodes to train on
-        num_eps = 100
-
-        player_1 = self
-        player_2 = BotPlayer()
-
-        for _ in range(num_eps):
-
-            # create a new game for each round
-            # this reps the board
-            state = State(player_1, player_2)
-
-            # player_1 starts
-            curr_player = player_1
-
-            # run the game
-            while not state.isEnd:
-
-                # first look at all valid moves the curr player can make
-                # note: getAvailablePositions() will return a dict where 
-                # each key is curr_player's pieces (rep as a tup)
-                # and each of those keys map to a list of tups that piece can move to
-                positions = state.getAvailablePositions(curr_player)
-
-                # then choose an action based on our Q-learning alg
-                action = curr_player.chooseAction(positions, state)
-
-                # then update state based on the chosen action
-                state.updateState(action)
-
-                # assign rewards
-                # this is called after every update state
-                # note: giveReward() calls feedReward()
-                state.giveReward()
-
-                # then add state to curr_player's states
-                curr_player.addStates(curr_player.getHash())
-
-                # swap turns
-                curr_player = player_1 if curr_player == player_2 else player_2
-
-            # reset game and run another episode
-            player_1.reset()
-            player_2.reset()
-
-        # at very end of training we save policy
-        self.savePolicy()
-
     def reset(self):
         self.states = []
 
@@ -136,6 +87,10 @@ class BotPlayer():
     def loadPolicy(self, file):
         fr = open(file, 'rb')
         self.states_value = pickle.load(fr)
+<<<<<<< Updated upstream
         fr.close()
 
     ########### finish later
+=======
+        fr.close()
+>>>>>>> Stashed changes
