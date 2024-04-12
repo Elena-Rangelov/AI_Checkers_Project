@@ -32,30 +32,32 @@ class BotPlayer():
     def getHash(self, board):
         return str(board.reshape(BOARD_COLS * BOARD_ROWS))
 
-    def chooseAction(self, pos, board):
+    def chooseAction(self, actions, board):
 
         # generate random number to determine if exploring or exploiting
         if random.random() <= self.explore:
 
             #exploring - randomly choose an action from the list of actions
-            p_id = random.choice(len(pos))
-            action = pos[p_id]
+            pos = random.choice(len(actions))
+            move = random.choice(len(actions[pos]))
+            action = actions[pos][move]
 
         # exploiting
         else:
             value_max = -999
-            for p in pos: # nested loop
-                next = board.copy()
-                next.updateState(p)
-                next_hash = self.getHash(next)
-                
-                value = 0 if self.states_value.get(next_hash) is None else self.states_value.get(next_hash)
+            for pos in actions: # nested loop
+                for move in pos:
+                    next = board.copy()
+                    next.updateState(move)
+                    next_hash = self.getHash(next)
+                    
+                    value = 0 if self.states_value.get(next_hash) is None else self.states_value.get(next_hash)
+    
+                    if value >= value_max:
+                        value_max = value
+                        result = move
 
-                if value >= value_max:
-                    value_max = value
-                    action = p
-
-        return action
+        return result
 
     def addStates(self, board_hash):
         self.states.append(board_hash)
