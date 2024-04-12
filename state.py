@@ -29,20 +29,21 @@ class State():
         for i in range(BOARD_COLS):
             for j in range(BOARD_ROWS):
 
+                positions[(i, j)] = []
+
+
                 # if first player, use 1 and 3
                 if p.first:
 
                     # if the current spot is our piece
                     if self.board[i][j]%2 == 1:
 
-                        positions[(i, j)] = []
-
                         # add first diagonal and possible jump
                         if i-1 >= 0 and j-1 >= 0:
                             if self.board[i-1][j-1] == 0:
-                                positions[(i, j)] += [[(i, j), (i-1, j-1)]]
+                                positions[(i, j)].append([(i, j), (i-1, j-1)])
                             elif i-2 >= 0 and j-2 >= 0 and self.board[i-1][j-1] != 0 and self.board[i-1][j-1]%2 == 0 and self.board[i-2][j-2] == 0:
-                                positions[(i, j)] += [[(i, j), (i-1, j-1), (i-2, j-2)]]
+                                positions[(i, j)].append([(i, j), (i-1, j-1), (i-2, j-2)])
 
                             # failed attempt at incoporating multiple jumps - for later
                                 
@@ -55,9 +56,9 @@ class State():
                         # add second diagonal and possible jump
                         if i+1 < BOARD_COLS and j-1 >= 0:
                             if self.board[i+1][j-1] == 0:
-                                positions[(i, j)] += [[(i, j), (i+1, j-1)]]
+                                positions[(i, j)].append([(i, j), (i+1, j-1)])
                             elif i+2 < BOARD_COLS and j-2 >= 0 and self.board[i+1][j-1] != 0 and self.board[i+1][j-1]%2 == 0 and self.board[i+2][j-2] == 0:
-                                positions[(i, j)] += [[(i, j), (i+1, j-1), (i+2, j-2)]]
+                                positions[(i, j)].append([(i, j), (i+1, j-1), (i+2, j-2)])
 
                         # if the piece is our queen piece
                         if self.board[i][j] == 3:
@@ -65,20 +66,18 @@ class State():
                             # add on the other two diagonals and possible jumps
                             if i+1 < BOARD_COLS and j+1 < BOARD_COLS:
                                 if self.board[i+1][j+1] == 0:
-                                    positions[(i, j)] += [[(i, j), (i+1, j+1)]]
+                                    positions[(i, j)].append([(i, j), (i+1, j+1)])
                                 elif i+2 < BOARD_COLS and j+2 < BOARD_COLS and self.board[i+1][j+1] != 0 and self.board[i+1][j+1]%2 == 0 and self.board[i+2][j+2] == 0:
-                                    positions[(i, j)] += [[(i, j), (i+1, j+1), (i+2, j+2)]]
+                                    positions[(i, j)].append([(i, j), (i+1, j+1), (i+2, j+2)])
 
                             if i-1 >= 0 and j+1 < BOARD_COLS:
                                 if self.board[i-1][j+1] == 0:
-                                    positions[(i, j)] += [[(i, j), (i-1, j+1)]]
+                                    positions[(i, j)].append([(i, j), (i-1, j+1)])
                                 elif i-2 >= 0 and j+2 < BOARD_COLS and self.board[i-1][j+1] != 0 and self.board[i-1][j+1]%2 == 0 and self.board[i-2][j+2] == 0:
-                                    positions[(i, j)] += [[(i, j), (i-1, j-1), (i-2, j+2)]]
+                                    positions[(i, j)].append([(i, j), (i-1, j-1), (i-2, j+2)])
                 
                 # if second player, use 2 and 4
                 else:
-
-                    positions[(i, j)] = []
 
                     # if this is our piece
                     if self.board[i][j]%2 == 0 and self.board[i][j] != 0:
@@ -86,16 +85,16 @@ class State():
                         # add first diagonal and possible jump
                         if i+1 < BOARD_COLS and j+1 < BOARD_COLS:
                             if self.board[i+1][j+1] == 0:
-                                positions[(i, j)] += [[(i, j), (i+1, j+1)]]
+                                positions[(i, j)].append([(i, j), (i+1, j+1)])
                             elif i+2 < BOARD_COLS and j+2 < BOARD_COLS and self.board[i+1][j+1]%2 == 1 and self.board[i+2][j+2] == 0:
-                                positions[(i, j)] += [[(i, j), (i+1, j+1), (i+2, j+2)]]
+                                positions[(i, j)].append([(i, j), (i+1, j+1), (i+2, j+2)])
 
                         # add second diagonal and possible jump
                         if i-1 >= 0 and j+1 < BOARD_COLS:
                             if self.board[i-1][j+1] == 0:
-                                positions[(i, j)] += [[(i, j), (i-1, j+1)]]
+                                positions[(i, j)].append([(i, j), (i-1, j+1)])
                             elif i-2 >= 0 and j+2 < BOARD_COLS and self.board[i-1][j+1] != 0 and self.board[i-1][j+1]%2 == 1 and self.board[i-2][j+2] == 0:
-                                positions[(i, j)] += [[(i, j), (i-1, j+1), (i-2, j+2)]]
+                                positions[(i, j)].append([(i, j), (i-1, j+1), (i-2, j+2)])
 
                         # if this is our queen piece
                         if self.board[i][j] == 3:
@@ -103,15 +102,20 @@ class State():
                             # adding the two other diagonals and possible jumps
                             if i-1 >= 0 and j-1 >= 0:
                                 if self.board[i-1][j-1] == 0:
-                                    positions[(i, j)] += [[(i, j), (i-1, j-1)]]
+                                    positions[(i, j)].append([(i, j), (i-1, j-1)])
                                 elif i-2 >= 0 and j-2 >= 0 and self.board[i-1][j-1] != 0 and self.board[i-1][j-1]%2 == 0 and self.board[i-2][j-2] == 0:
-                                    positions[(i, j)] += [[(i, j), (i-1, j-1), (i-2, j-2)]]
+                                    positions[(i, j)].append([(i, j), (i-1, j-1), (i-2, j-2)])
 
                             if i+1 < BOARD_COLS and j-1 >= 0:
                                 if self.board[i+1][j-1] == 0:
-                                    positions[(i, j)] += [[(i, j), (i+1, j-1)]]
+                                    positions[(i, j)].append([(i, j), (i+1, j-1)])
                                 elif i+2 < BOARD_COLS and j-2 >= 0 and self.board[i+1][j-1] != 0 and self.board[i+1][j-1]%2 == 0 and self.board[i-2][j-2] == 0:
-                                    positions[(i, j)] += [[(i, j), (i+1, j-1), (i+2, j-2)]]
+                                    positions[(i, j)].append([(i, j), (i+1, j-1), (i+2, j-2)])
+
+                if len(positions[(i, j)]) == 0:
+                    positions.pop((i, j))
+
+        return positions
                         
     def winner(self):
          
@@ -248,6 +252,8 @@ class State():
                 # each key is curr_player's pieces (rep as a tup)
                 # and each of those keys map to a list of tups that piece can move to
                 positions = self.getAvailablePositions(curr_player)
+
+                print(positions)
 
                 # then choose an action based on our Q-learning alg
                 action = curr_player.chooseAction(positions, self)

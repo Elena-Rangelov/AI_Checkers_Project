@@ -2,6 +2,7 @@
 import numpy as np
 import random
 import pickle
+import copy
 
 from state import State
 
@@ -34,24 +35,27 @@ class Player():
     def getHash(self, board):
         return str(board.reshape(BOARD_COLS * BOARD_ROWS))
 
-    def chooseAction(self, actions, board):
+    def chooseAction(self, actions, state):
 
         # generate random number to determine if exploring or exploiting
         if random.random() <= self.exp_rate:
 
             #exploring - randomly choose an action from the list of actions
-            pos = random.choice(len(actions))
-            move = random.choice(len(actions[pos]))
-            action = actions[pos][move]
+            pos = random.choice(list(actions.keys()))
+            print(actions.keys())
+            print(pos)
+            print(actions[pos])
+            move = random.choice(actions[pos])
+            result = actions[pos][move]
 
         # exploiting
         else:
             value_max = -999
             for pos in actions: # nested loop
-                for move in pos:
-                    next = board.copy()
+                for move in actions[pos]:
+                    next = copy.deepcopy(state)
                     next.updateState(move)
-                    next_hash = self.getHash(next)
+                    next_hash = self.getHash(next.board)
                     
                     value = 0 if self.states_value.get(next_hash) is None else self.states_value.get(next_hash)
     
@@ -71,7 +75,7 @@ class Player():
             if self.states_value.get(curr) is None:
                 self.states_value[curr] = 0
             # Use value iteration formula
-            self.states_value[curr] += self.lr * (self.decay_gamma * reward - self.states_value[curr])
+            self.states_value[curr] += self.learning_rate * (self.decay_gamma * reward - self.states_value[curr])
             # Updates reward for next iteration
             reward = self.states_value[curr]
 
@@ -87,10 +91,6 @@ class Player():
     def loadPolicy(self, file):
         fr = open(file, 'rb')
         self.states_value = pickle.load(fr)
-<<<<<<< Updated upstream
         fr.close()
 
     ########### finish later
-=======
-        fr.close()
->>>>>>> Stashed changes
