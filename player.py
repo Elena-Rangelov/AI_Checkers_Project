@@ -11,9 +11,10 @@ BOARD_ROWS = 8
 
 class Player():
     
-    def __init__(self, first):
+    def __init__(self, name, first):
 
         # records all positions taken for training purposes
+        self.name = name
         self.states = []
 
         # how much Q-vals are updated towards newly calc Q-vals
@@ -36,17 +37,15 @@ class Player():
         return str(board.reshape(BOARD_COLS * BOARD_ROWS))
 
     def chooseAction(self, actions, state):
-
         # generate random number to determine if exploring or exploiting
+
         if random.random() <= self.exp_rate:
 
             #exploring - randomly choose an action from the list of actions
             pos = random.choice(list(actions.keys()))
-            print(actions.keys())
-            print(pos)
-            print(actions[pos])
             move = random.choice(actions[pos])
-            result = actions[pos][move]
+
+            result = move
 
         # exploiting
         else:

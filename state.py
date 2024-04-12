@@ -230,7 +230,7 @@ class State():
     def play(self, rounds=100):
        
         # number of episodes to train on
-        num_eps = 100
+        num_eps = 1
 
         player_1 = self.p1
         player_2 = self.p2
@@ -253,7 +253,9 @@ class State():
                 # and each of those keys map to a list of tups that piece can move to
                 positions = self.getAvailablePositions(curr_player)
 
-                print(positions)
+                if positions == {}:
+                    self.isEnd = True
+                    break
 
                 # then choose an action based on our Q-learning alg
                 action = curr_player.chooseAction(positions, self)
@@ -272,13 +274,14 @@ class State():
                 # swap turns
                 curr_player = player_1 if curr_player == player_2 else player_2
 
-            print(self.board)
+                print(self.board)
+                print()
             # reset game and run another episode
             player_1.reset()
             player_2.reset()
 
         # at very end of training we save policy
-        self.savePolicy()
+        # self.savePolicy()
 
 
     ############################# FOR LATER
